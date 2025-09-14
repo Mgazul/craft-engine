@@ -2454,6 +2454,7 @@ public class PacketConsumers {
                 handler.handleMove(user, event, packet);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             CraftEngine.instance().logger().warn("Failed to handle ClientboundMoveEntityPacket", e);
         }
     };

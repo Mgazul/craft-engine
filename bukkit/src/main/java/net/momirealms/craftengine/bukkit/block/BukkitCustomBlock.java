@@ -143,14 +143,6 @@ public final class BukkitCustomBlock extends AbstractCustomBlock {
                     int blockLight = settings.blockLight() != -1 ? settings.blockLight() : CoreReflections.field$BlockStateBase$lightBlock.getInt(immutableBlockState.vanillaBlockState().literalObject());
                     // set block light
                     CoreReflections.field$BlockStateBase$lightBlock.set(nmsState, blockLight);
-                    // set propagates skylight
-                    if (settings.propagatesSkylightDown() == Tristate.TRUE) {
-                        CoreReflections.field$BlockStateBase$propagatesSkylightDown.set(nmsState, true);
-                    } else if (settings.propagatesSkylightDown() == Tristate.FALSE) {
-                        CoreReflections.field$BlockStateBase$propagatesSkylightDown.set(nmsState, false);
-                    } else {
-                        CoreReflections.field$BlockStateBase$propagatesSkylightDown.set(nmsState, CoreReflections.field$BlockStateBase$propagatesSkylightDown.getBoolean(immutableBlockState.vanillaBlockState().literalObject()));
-                    }
                 } else {
                     Object cache = CoreReflections.field$BlockStateBase$cache.get(nmsState);
                     int blockLight = settings.blockLight() != -1 ? settings.blockLight() : CoreReflections.field$BlockStateBase$Cache$lightBlock.getInt(CoreReflections.field$BlockStateBase$cache.get(immutableBlockState.vanillaBlockState().literalObject()));

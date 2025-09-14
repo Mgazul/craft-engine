@@ -1,5 +1,6 @@
 package net.momirealms.craftengine.bukkit.plugin.injector;
 
+import java.lang.reflect.Field;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.ClassFileVersion;
 import net.bytebuddy.description.field.FieldDescription;
@@ -18,36 +19,20 @@ import java.lang.reflect.Modifier;
 public final class ProtectedFieldVisitor {
     private static FieldAccessor internalFieldAccessor;
 
-    public static void init() throws ReflectiveOperationException {
-        ByteBuddy byteBuddy = new ByteBuddy(ClassFileVersion.JAVA_V17);
-        // InternalFieldAccessor Interface
-        Class<?> internalFieldAccessorInterface = byteBuddy
-                .makeInterface()
-                .name("net.momirealms.craftengine.bukkit.plugin.injector.FieldAccessor")
-                .defineMethod("field$ClientboundMoveEntityPacket$entityId", int.class, Modifier.PUBLIC)
-                .withParameter(Object.class, "packet")
-                .withoutCode()
-                .make()
-                .load(NetworkReflections.clazz$ClientboundMoveEntityPacket.getClassLoader(), ClassLoadingStrategy.Default.INJECTION)
-                .getLoaded();
+    public static void init() throws Exception {
+        // Since the field can be directly accessed, we create a simple implementation
+        internalFieldAccessor = new FieldAccessor() {
+            private final Field entityIdField = NetworkReflections.field$ClientboundMoveEntityPacket$entityId;
 
-        // Internal field accessor
-        FieldDescription moveEntityIdFieldDesc = new FieldDescription.ForLoadedField(NetworkReflections.field$ClientboundMoveEntityPacket$entityId);
-        Class<?> clazz$InternalFieldAccessor = byteBuddy
-                .subclass(Object.class)
-                .name("net.minecraft.network.protocol.game.CraftEngineInternalFieldAccessor")
-                .implement(internalFieldAccessorInterface)
-                .method(ElementMatchers.named("field$ClientboundMoveEntityPacket$entityId"))
-                .intercept(new Implementation.Simple(
-                        MethodVariableAccess.REFERENCE.loadFrom(1),
-                        TypeCasting.to(TypeDescription.ForLoadedType.of(NetworkReflections.clazz$ClientboundMoveEntityPacket)),
-                        FieldAccess.forField(moveEntityIdFieldDesc).read(),
-                        MethodReturn.INTEGER
-                ))
-                .make()
-                .load(NetworkReflections.clazz$ClientboundMoveEntityPacket.getClassLoader(), ClassLoadingStrategy.Default.INJECTION)
-                .getLoaded();
-        internalFieldAccessor = (FieldAccessor) clazz$InternalFieldAccessor.getConstructor().newInstance();
+            @Override
+            public int field$ClientboundMoveEntityPacket$entityId(Object packet) {
+                try {
+                    return entityIdField.getInt(packet);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("Failed to access entityId field", e);
+                }
+            }
+        };
     }
 
     public static FieldAccessor get() {

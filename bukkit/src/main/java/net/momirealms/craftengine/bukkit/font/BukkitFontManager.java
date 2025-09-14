@@ -81,6 +81,7 @@ public class BukkitFontManager extends AbstractFontManager implements Listener {
 
     private List<String> getEmojiSuggestion(Player player) {
         List<String> suggestions = new ArrayList<>();
+        if (super.emojiList == null) return suggestions;
         for (Emoji emoji : super.emojiList) {
             if (emoji.permission() == null || player.hasPermission(Objects.requireNonNull(emoji.permission()))) {
                 suggestions.addAll(emoji.keywords());

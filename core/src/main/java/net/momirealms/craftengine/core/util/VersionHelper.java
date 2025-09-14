@@ -124,13 +124,7 @@ public class VersionHelper {
     }
 
     private static boolean checkMojMap() {
-        // Check if the server is Mojmap
-        try {
-            Class.forName("net.neoforged.art.internal.RenamerImpl");
-            return true;
-        } catch (ClassNotFoundException ignored) {
-        }
-        return false;
+        return true;
     }
 
     private static boolean checkFolia() {
@@ -173,7 +167,7 @@ public class VersionHelper {
     }
 
     public static boolean isMojmap() {
-        return mojmap;
+        return true;
     }
 
     public static boolean isOrAbove1_20() {
